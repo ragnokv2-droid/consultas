@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { AlertCircle, Box, LoaderCircle, Search, ShieldCheck } from "lucide-react";
+import {
+  AlertCircle, Box, CheckCircle2, Copy, LoaderCircle, Search, ShieldCheck, X
+} from "lucide-react";
 
 type Shipment = {
   nome: string;
@@ -14,6 +16,12 @@ type ApiResponse = {
   found: boolean;
   shipments?: Shipment[];
   message?: string;
+};
+
+type PixData = {
+  brCode: string;
+  qrCode: string;
+  amount: number;
 };
 
 function formatCpf(value: string) {
@@ -44,6 +52,10 @@ export default function ConsultaEncomenda() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ApiResponse | null>(null);
   const [error, setError] = useState("");
+  const [pix, setPix] = useState<PixData | null>(null);
+  const [pixLoading, setPixLoading] = useState(false);
+  const [pixError, setPixError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -69,6 +81,33 @@ export default function ConsultaEncomenda() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function abrirPix(amount: number) {
+    setPixError("");
+    setPixLoading(true);
+    setCopied(false);
+    try {
+      const response = await fetch("/api/pix", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Não foi possível gerar o PIX.");
+      setPix(data);
+    } catch (err) {
+      setPixError(err instanceof Error ? err.message : "Não foi possível gerar o PIX.");
+    } finally {
+      setPixLoading(false);
+    }
+  }
+
+  async function copiarPix() {
+    if (!pix) return;
+    await navigator.clipboard.writeText(pix.brCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
@@ -117,10 +156,14 @@ export default function ConsultaEncomenda() {
                   <div><dt>Previsão de chegada:</dt><dd>{previsaoChegada()}</dd></div>
                   <div><dt>Motivo da retenção:</dt><dd>Taxa aduaneira não recolhida</dd></div>
                 </dl>
-                <div className="fee-box">Consta uma taxa relacionada à encomenda no valor de <strong>{money(item.valorTaxa)}</strong>.</div>
-                {item.linkPagamento && (
-                  <a className="primary-link" href={item.linkPagamento} target="_blank" rel="noreferrer">Ver instruções para regularização</a>
-                )}
+                <div className="fee-box">
+                  Consta uma taxa relacionada à encomenda no valor de <strong>{money(item.valorTaxa)}</strong>.
+                </div>
+                <button className="pix-open" onClick={() => abrirPix(item.valorTaxa)} disabled={pixLoading}>
+                  {pixLoading ? <LoaderCircle className="spin" size={18} /> : null}
+                  {pixLoading ? "Gerando PIX..." : "Prosseguir com a regularização"}
+                </button>
+                {pixError && <p className="error"><AlertCircle size={17} />{pixError}</p>}
               </article>
             ))}
             <button className="secondary" onClick={() => setResult(null)}>Realizar nova consulta</button>
@@ -129,6 +172,31 @@ export default function ConsultaEncomenda() {
       </section>
 
       <footer><ShieldCheck size={16} />Área de acompanhamento da Mundo Atleta. Este site não pertence à Receita Federal do Brasil nem aos Correios.</footer>
+
+      {pix && (
+        <div className="modal-backdrop" onMouseDown={() => setPix(null)}>
+          <div className="pix-modal" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <button className="modal-close" onClick={() => setPix(null)} aria-label="Fechar"><X size={20} /></button>
+            <h3>Pagamento via PIX — Mundo Atleta</h3>
+            <p className="pix-subtitle">
+              Escaneie o QR Code ou copie o código abaixo. Valor: <strong>{money(pix.amount)}</strong>
+            </p>
+            <img className="pix-qr" src={pix.qrCode} alt="QR Code PIX" />
+            <p className="pix-label">Código PIX copia e cola:</p>
+            <div className="copy-row">
+              <input readOnly value={pix.brCode} />
+              <button onClick={copiarPix}>
+                {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
+                {copied ? "Copiado!" : "Copiar PIX"}
+              </button>
+            </div>
+            <div className="pix-info">
+              <ShieldCheck size={18} />
+              <span>Pagamento destinado à Mundo Atleta para regularização do pedido junto à loja.</span>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
