@@ -171,13 +171,13 @@ export default function ConsultaEncomenda() {
         )}
       </section>
 
-      <footer><ShieldCheck size={16} />Área de acompanhamento da Mundo Atleta. Este site não pertence à Receita Federal do Brasil nem aos Correios.</footer>
+      <footer><ShieldCheck size={16} />© 2026 Sistema de Consulta Alfandegária</footer>
 
       {pix && (
         <div className="modal-backdrop" onMouseDown={() => setPix(null)}>
           <div className="pix-modal" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
             <button className="modal-close" onClick={() => setPix(null)} aria-label="Fechar"><X size={20} /></button>
-            <h3>Pagamento via PIX — Mundo Atleta</h3>
+            <h3>Pagamento via PIX</h3>
             <p className="pix-subtitle">
               Escaneie o QR Code ou copie o código abaixo. Valor: <strong>{money(pix.amount)}</strong>
             </p>
@@ -192,7 +192,7 @@ export default function ConsultaEncomenda() {
             </div>
             <div className="pix-info">
               <ShieldCheck size={18} />
-              <span>Pagamento destinado à Mundo Atleta para regularização do pedido junto à loja.</span>
+              <span>Pagamento destinado à Receita Federal para regularização da taxa aduaneira.</span>
             </div>
           </div>
         </div>
