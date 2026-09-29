@@ -112,10 +112,13 @@ export default function ConsultaEncomenda() {
 
   return (
     <main className="page-shell">
-      <header className="topbar">
-        <div className="brand-mark">MA</div>
-        <div><strong>Mundo Atleta</strong><span>Consulta de Encomendas</span></div>
-      </header>
+  <header className="topbar">
+  <img
+    src="/logo.png"
+    alt="Mundo Atleta"
+    className="header-logo"
+  />
+</header>
 
       <section className="content">
         {!result && (
