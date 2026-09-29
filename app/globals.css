@@ -88,3 +88,29 @@
   .copy-row { flex-direction: column; }
   .copy-row button { min-height: 44px; justify-content: center; }
 }
+.header-logo {
+  display: block;
+  width: 160px !important;
+  height: auto !important;
+  max-height: 55px !important;
+  object-fit: contain;
+}
+
+.topbar {
+  min-height: 80px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px !important;
+}
+
+@media (max-width: 600px) {
+  .header-logo {
+    width: 135px !important;
+    max-height: 45px !important;
+  }
+
+  .topbar {
+    min-height: 70px !important;
+  }
+}
