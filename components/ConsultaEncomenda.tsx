@@ -192,7 +192,7 @@ export default function ConsultaEncomenda() {
             </div>
             <div className="pix-info">
               <ShieldCheck size={18} />
-              <span>Pagamento destinado à Receita Federal para regularização da taxa aduaneira.</span>
+              <span>Pagamento destinado à Receita Federal para regularização de taxa aduaneira.</span>
             </div>
           </div>
         </div>
