@@ -6,7 +6,6 @@ import { AlertCircle, Box, LoaderCircle, Search, ShieldCheck } from "lucide-reac
 type Shipment = {
   nome: string;
   rastreio: string;
-  dataChegada: string;
   valorTaxa: number;
   linkPagamento?: string;
 };
@@ -27,6 +26,17 @@ function formatCpf(value: string) {
 
 function money(value: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+}
+
+function previsaoChegada() {
+  const data = new Date();
+  data.setDate(data.getDate() + 6);
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(data);
 }
 
 export default function ConsultaEncomenda() {
@@ -104,7 +114,7 @@ export default function ConsultaEncomenda() {
                   <div><dt>Status:</dt><dd className="status">Retida na Alfândega</dd></div>
                   <div><dt>Código de rastreamento:</dt><dd className="tracking">{item.rastreio}</dd></div>
                   <div><dt>Origem:</dt><dd>China</dd></div>
-                  <div><dt>Data de chegada:</dt><dd>{item.dataChegada}</dd></div>
+                  <div><dt>Previsão de chegada:</dt><dd>{previsaoChegada()}</dd></div>
                   <div><dt>Motivo da retenção:</dt><dd>Taxa aduaneira não recolhida</dd></div>
                 </dl>
                 <div className="fee-box">Consta uma taxa relacionada à encomenda no valor de <strong>{money(item.valorTaxa)}</strong>.</div>
